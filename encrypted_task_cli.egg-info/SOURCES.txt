@@ -1,0 +1,13 @@
+README.md
+pyproject.toml
+encrypted_task_cli.egg-info/PKG-INFO
+encrypted_task_cli.egg-info/SOURCES.txt
+encrypted_task_cli.egg-info/dependency_links.txt
+encrypted_task_cli.egg-info/entry_points.txt
+encrypted_task_cli.egg-info/requires.txt
+encrypted_task_cli.egg-info/top_level.txt
+todo/__init__.py
+todo/__main__.py
+todo/click_app.py
+todo/crypto.py
+todo/storage.py

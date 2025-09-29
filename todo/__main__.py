@@ -3,6 +3,7 @@ import getpass
 from typing import Optional
 
 from .storage import EncryptedStorage
+from .click_app import cli
 
 
 def prompt_password(prompt: str = "Password: ") -> str:
@@ -142,10 +143,8 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: Optional[list] = None) -> None:
-    parser = build_parser()
-    args = parser.parse_args(argv)
-    args.func(args)
+def main() -> None:
+    cli(standalone_mode=True)
 
 
 if __name__ == "__main__":

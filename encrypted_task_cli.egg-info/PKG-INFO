@@ -1,3 +1,13 @@
+Metadata-Version: 2.4
+Name: encrypted-task-cli
+Version: 0.1.0
+Summary: Encrypted CLI todo tool
+Author: You
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: cryptography>=42.0.0
+Requires-Dist: click>=8.1.7
+
 ## Encrypted Task CLI
 
 A simple Python CLI todo tool that stores tasks encrypted. Unlock with a password, using modern AES-GCM and Argon2id key derivation.

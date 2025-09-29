@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "encrypted-task-cli"
+version = "0.1.0"
+description = "Encrypted CLI todo tool"
+authors = [{ name = "You" }]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "cryptography>=42.0.0",
+  "click>=8.1.7",
+]
+
+[project.scripts]
+todo = "todo.click_app:cli"
