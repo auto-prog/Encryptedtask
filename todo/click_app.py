@@ -4,7 +4,7 @@ import click
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from .storage import EncryptedStorage
+from .storage import EncryptedStorage, list_vaults, delete_vault, DEFAULT_VAULT_NAME
 
 
 def prompt_password(prompt: str = "Password: ") -> str:
@@ -12,15 +12,19 @@ def prompt_password(prompt: str = "Password: ") -> str:
 
 
 @click.group(help="Encrypted Todo CLI")
-def cli() -> None:
-    pass
+@click.option("--vault", "vault_name", default=DEFAULT_VAULT_NAME, show_default=True, help="vault name")
+@click.pass_context
+def cli(ctx: click.Context, vault_name: str) -> None:
+    ctx.ensure_object(dict)
+    ctx.obj["vault_name"] = vault_name
 
 
 @cli.command()
 @click.option("--force", is_flag=True, help="overwrite existing vault")
-def init(force: bool) -> None:
+@click.pass_context
+def init(ctx: click.Context, force: bool) -> None:
     console = Console()
-    store = EncryptedStorage()
+    store = EncryptedStorage(vault_name=ctx.obj["vault_name"])
     if store.exists() and not force:
         click.echo("Vault already exists. Use --force to overwrite.")
         return
@@ -37,7 +41,6 @@ def init(force: bool) -> None:
         console=console,
     ) as progress:
         task_id = progress.add_task("initializing", total=None)
-        # simulate short work while writing the vault
         store.initialize(password)
         time.sleep(0.6)
         progress.remove_task(task_id)
@@ -47,8 +50,9 @@ def init(force: bool) -> None:
 
 @cli.command()
 @click.argument("text")
-def add(text: str) -> None:
-    store = EncryptedStorage()
+@click.pass_context
+def add(ctx: click.Context, text: str) -> None:
+    store = EncryptedStorage(vault_name=ctx.obj["vault_name"])
     if not store.exists():
         click.echo("No vault found. Run: todo init")
         return
@@ -60,8 +64,9 @@ def add(text: str) -> None:
 
 
 @cli.command(name="list")
-def list_cmd() -> None:
-    store = EncryptedStorage()
+@click.pass_context
+def list_cmd(ctx: click.Context) -> None:
+    store = EncryptedStorage(vault_name=ctx.obj["vault_name"])
     if not store.exists():
         click.echo("No vault found. Run: todo init")
         return
@@ -77,8 +82,9 @@ def list_cmd() -> None:
 
 @cli.command()
 @click.argument("id", type=int)
-def done(id: int) -> None:
-    store = EncryptedStorage()
+@click.pass_context
+def done(ctx: click.Context, id: int) -> None:
+    store = EncryptedStorage(vault_name=ctx.obj["vault_name"])
     if not store.exists():
         click.echo("No vault found. Run: todo init")
         return
@@ -95,8 +101,9 @@ def done(id: int) -> None:
 
 @cli.command()
 @click.argument("id", type=int)
-def remove(id: int) -> None:
-    store = EncryptedStorage()
+@click.pass_context
+def remove(ctx: click.Context, id: int) -> None:
+    store = EncryptedStorage(vault_name=ctx.obj["vault_name"])
     if not store.exists():
         click.echo("No vault found. Run: todo init")
         return
@@ -110,8 +117,9 @@ def remove(id: int) -> None:
 
 
 @cli.command()
-def clear() -> None:
-    store = EncryptedStorage()
+@click.pass_context
+def clear(ctx: click.Context) -> None:
+    store = EncryptedStorage(vault_name=ctx.obj["vault_name"])
     if not store.exists():
         click.echo("No vault found. Run: todo init")
         return
@@ -123,8 +131,9 @@ def clear() -> None:
 
 
 @cli.command(name="change-password")
-def change_password() -> None:
-    store = EncryptedStorage()
+@click.pass_context
+def change_password(ctx: click.Context) -> None:
+    store = EncryptedStorage(vault_name=ctx.obj["vault_name"])
     if not store.exists():
         click.echo("No vault found. Run: todo init")
         return
@@ -139,3 +148,27 @@ def change_password() -> None:
         click.echo("Password changed.")
     except Exception:
         click.echo("Failed to change password. Wrong current password?")
+
+
+@cli.group(help="Manage vaults")
+def vaults() -> None:
+    pass
+
+
+@vaults.command("list")
+def vaults_list() -> None:
+    names = list_vaults()
+    if not names:
+        click.echo("No vaults found.")
+        return
+    for n in names:
+        click.echo(n)
+
+
+@vaults.command("remove")
+@click.argument("name")
+def vaults_remove(name: str) -> None:
+    if delete_vault(name):
+        click.echo(f"Removed vault '{name}'")
+    else:
+        click.echo("Vault not found.")

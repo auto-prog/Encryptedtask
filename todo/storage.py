@@ -7,7 +7,7 @@ from typing import List, Optional
 from .crypto import encrypt_json, decrypt_json
 
 
-VAULT_FILENAME = "vault.todo"
+DEFAULT_VAULT_NAME = "vault"
 
 
 def get_data_dir() -> Path:
@@ -15,6 +15,24 @@ def get_data_dir() -> Path:
     path = Path(base) / "encrypted_task_cli"
     path.mkdir(parents=True, exist_ok=True)
     return path
+
+
+def vault_filename(vault_name: str) -> str:
+    return f"{vault_name}.todo"
+
+
+def list_vaults(directory: Optional[Path] = None) -> List[str]:
+    directory = directory or get_data_dir()
+    return [p.stem for p in directory.glob("*.todo")]
+
+
+def delete_vault(vault_name: str, directory: Optional[Path] = None) -> bool:
+    directory = directory or get_data_dir()
+    fp = directory / vault_filename(vault_name)
+    if fp.exists():
+        fp.unlink()
+        return True
+    return False
 
 
 @dataclass
@@ -57,9 +75,10 @@ class Vault:
 
 
 class EncryptedStorage:
-    def __init__(self, directory: Optional[Path] = None):
+    def __init__(self, directory: Optional[Path] = None, vault_name: str = DEFAULT_VAULT_NAME):
         self.directory = directory or get_data_dir()
-        self.filepath = self.directory / VAULT_FILENAME
+        self.vault_name = vault_name
+        self.filepath = self.directory / vault_filename(vault_name)
 
     def exists(self) -> bool:
         return self.filepath.exists()

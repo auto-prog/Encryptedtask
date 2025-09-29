@@ -6,6 +6,7 @@ A simple Python CLI todo tool that stores tasks encrypted. Unlock with a passwor
 - Initialize an encrypted task vault
 - Add/list/complete/remove/clear tasks
 - Change password (secure re-encryption)
+- Multiple vaults with `--vault` and `vaults` management commands
 
 ### Quickstart
 ```bash
@@ -17,6 +18,17 @@ pip install -e .  # creates `todo` console command
 todo init
 todo add "Buy milk"
 todo list
+```
+
+### Multiple vaults
+```bash
+# work in a separate vault named "work"
+todo --vault work init
+todo --vault work add "Prepare slides"
+
+todo vaults list
+# remove a vault file
+todo vaults remove work
 ```
 
 ### Security
@@ -34,6 +46,7 @@ Files are written to the user's config directory (platform aware). Avoid committ
 - `remove <id>`: Delete a task
 - `clear`: Remove all completed tasks
 - `change-password`: Re-encrypt vault with a new password
+- `vaults list|remove`: Manage vault files
 
 ### Notes
 - If you forget your password, data cannot be recovered.
