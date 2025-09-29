@@ -1,7 +1,8 @@
 ## Encrypted Task CLI
 
 A simple Python CLI todo tool that stores tasks encrypted. Unlock with a password, using modern AES-GCM and Argon2id key derivation.
-
+### Diagram
+![alt text](diagram.png)
 ### Features
 - Initialize an encrypted task vault
 - Add/list/complete/remove/clear tasks
