@@ -1,5 +1,8 @@
 import getpass
+import time
 import click
+from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from .storage import EncryptedStorage
 
@@ -16,6 +19,7 @@ def cli() -> None:
 @cli.command()
 @click.option("--force", is_flag=True, help="overwrite existing vault")
 def init(force: bool) -> None:
+    console = Console()
     store = EncryptedStorage()
     if store.exists() and not force:
         click.echo("Vault already exists. Use --force to overwrite.")
@@ -25,8 +29,20 @@ def init(force: bool) -> None:
     if password != confirm:
         click.echo("Passwords do not match.")
         return
-    store.initialize(password)
-    click.echo("Initialized encrypted todo vault.")
+
+    with Progress(
+        SpinnerColumn(spinner_name="dots"),
+        TextColumn("[bold]The Vault[/bold]"),
+        transient=True,
+        console=console,
+    ) as progress:
+        task_id = progress.add_task("initializing", total=None)
+        # simulate short work while writing the vault
+        store.initialize(password)
+        time.sleep(0.6)
+        progress.remove_task(task_id)
+
+    console.print("Initialized encrypted todo vault.")
 
 
 @cli.command()
